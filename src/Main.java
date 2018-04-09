@@ -4,8 +4,7 @@ import java.util.*;
 
 public class Main {
 	
-	static ArrayList<ATask> ArrayOfTasks = new ArrayList<ATask>();
-	
+	static ArrayList<ATask> Tasks = new ArrayList<ATask>();
 
 	public static void main(String[] args) {
 		
@@ -19,7 +18,8 @@ public class Main {
 		}
 		myScanner.close();
 		
-		ArrayOfTasks = TextProcessor(TextToProcess);
+		Tasks = TextProcessor(TextToProcess);
+		TaskProcessor(Tasks);
 	}
 	
 	public static ArrayList<ATask> TextProcessor(ArrayList<String> TextToProcess)
@@ -35,5 +35,49 @@ public class Main {
 		
 		return Result;
 	}
-
+	
+	public static void TaskProcessor(ArrayList<ATask> Tasks)
+	{
+		/*
+		 * If priority = 0 --> SRTF: Shortest remaining time first
+		 * If priority = 1 --> RR: Round robin scheduling
+		 */
+		String firstLine = new String("");
+		String secondLine = new String("");
+		
+		Collections.sort(Tasks , new Comparator<ATask>() {
+			@Override
+			public int compare(ATask lhs, ATask rhs) {
+				return lhs.Start < rhs.Start ? -1 : (lhs.Start > rhs.Start ? 1 : 0);
+			}
+		});
+		
+		int RRtime = 2;
+		// As time passes
+		for(int time = 0; isFinished(Tasks); time++)
+		{
+			for(ATask task : Tasks)
+			{
+				if(task.Start <= time)
+				{
+					
+				}
+			}
+		}
+/*
+		for(ATask test : Tasks)
+		{
+			test.test();
+		}*/
+	}
+	
+	public static boolean isFinished(ArrayList<ATask> Tasks)
+	{
+		for(ATask task : Tasks)
+		{
+			if(task.CPU != 0)
+				return false;
+		}
+		return true;
+	}
 }
