@@ -7,6 +7,7 @@ public class ATask {
 	int Priority;
 	int Start;
 	int CPU;
+	int Wait;
 	
 	ATask(String NameToSet, int PriorityToSet,int StartToSet, int CPUToSet)
 	{
@@ -14,9 +15,6 @@ public class ATask {
 		Priority = PriorityToSet;
 		Start = StartToSet;
 		CPU = CPUToSet;
-	}
-	
-	public void test() {
-		System.out.println(Name + "      " + Priority + "      " + Start + "       " + "     " + CPU );
+		Wait = 0;
 	}
 }

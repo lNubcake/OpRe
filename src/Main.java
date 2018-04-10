@@ -11,14 +11,16 @@ public class Main {
 		Scanner myScanner = new Scanner(System.in);
 		ArrayList<String> TextToProcess = new ArrayList<String>();
 		
-		
+		// Scanning in text till EOF
 		while(myScanner.hasNextLine())
 		{
 			TextToProcess.add(myScanner.nextLine());
 		}
 		myScanner.close();
 		
+		// Converts the text to tasks
 		Tasks = TextProcessor(TextToProcess);
+		// Processes the tasks and gives the output
 		TaskProcessor(Tasks);
 	}
 	
@@ -79,6 +81,10 @@ public class Main {
 			{
 				if(task.Priority == 0 && !Kernel.contains(task))
 				{
+					if(Kernel.isEmpty())
+					{
+						User.add(User.pollFirst());
+					}
 					Kernel.add(task);
 				}
 				if(task.Priority == 1 && !User.contains(task))
@@ -94,13 +100,10 @@ public class Main {
 					return lhs.CPU < rhs.CPU ? -1 : (lhs.CPU > rhs.CPU ? 1 : 0);
 				}
 			});
-
 			
 			if(!Kernel.isEmpty())
 			{
 				// SRTF: Shortest remaining time first
-				// TODO remember sorting the list. If a task is terminated, it goes last on the list if the CPU times equals
-				
 				RRtime = 2;
 				
 					if(!firstLine.isEmpty())
@@ -113,6 +116,13 @@ public class Main {
 						firstLine += Kernel.get(0).Name;
 					}
 					Kernel.get(0).CPU -= 1;
+					for(ATask task : TasksToWorkWith)
+					{
+						if(!Kernel.get(0).equals(task))
+						{
+							task.Wait += 1;
+						}
+					}
 			}
 			else 
 			{
@@ -134,6 +144,14 @@ public class Main {
 				User.getFirst().CPU -= 1;
 				RRtime -= 1;
 				
+				for(ATask task : TasksToWorkWith)
+				{
+					if(!User.get(0).equals(task))
+					{
+						task.Wait += 1;
+					}
+				}
+				
 				if(RRtime == 0)
 				{
 					RRtime = 2;
@@ -141,12 +159,16 @@ public class Main {
 				}
 			}
 		}
-		System.out.println(firstLine);
-/*
-		for(ATask test : Tasks)
+		
+		for(ATask task : Tasks)
 		{
-			test.test();
-		}*/
+			secondLine += (task.Name + ":" + task.Wait + ",");
+		}
+		// Cutting down the last ','
+		secondLine = secondLine.substring(0, secondLine.length()-1);
+		
+		System.out.println(firstLine);
+		System.out.println(secondLine);
 	}
 	
 	public static boolean isFinished(ArrayList<ATask> Tasks)
