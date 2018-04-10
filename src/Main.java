@@ -49,53 +49,99 @@ public class Main {
 		});
 		
 		int RRtime = 2;
+		ArrayList<ATask> Kernel = new ArrayList<ATask>();
+		LinkedList<ATask> User = new LinkedList<ATask>();
+		
 		// As time passes
-		for(int time = 0; isFinished(Tasks); time++)
-		{
+		for(int time = 0; !isFinished(Tasks); time++)
+		{	
 			ArrayList<ATask> TasksToWorkWith = new ArrayList<ATask>();
 			for(ATask task : Tasks)
 			{
-				// It's already sorted based on Start time
 				if(task.Start <= time && task.CPU != 0)
 				{
 					TasksToWorkWith.add(task);
 				}
-				
+				if(task.CPU == 0)
+				{
+					if(Kernel.contains(task))
+					{
+						Kernel.remove(task);
+					}
+					if(User.contains(task))
+					{
+						User.remove(task);
+					}
+				}
 			}
-			
-			ArrayList<ATask> Kernel = new ArrayList<ATask>();
-			ArrayList<ATask> User = new ArrayList<ATask>();
+		
 			for(ATask task : TasksToWorkWith)
 			{
-				if(task.Priority == 0)
+				if(task.Priority == 0 && !Kernel.contains(task))
 				{
 					Kernel.add(task);
 				}
-				if(task.Priority == 1)
+				if(task.Priority == 1 && !User.contains(task))
 				{
 					User.add(task);
 				}
-				// Still sorted based on Start time
 			}
+			
+			// TODO handle exception
+			Collections.sort(Kernel , new Comparator<ATask>() {
+				@Override
+				public int compare(ATask lhs, ATask rhs) {
+					return lhs.CPU < rhs.CPU ? -1 : (lhs.CPU > rhs.CPU ? 1 : 0);
+				}
+			});
+
+			
 			if(!Kernel.isEmpty())
 			{
 				// SRTF: Shortest remaining time first
+				// TODO remember sorting the list. If a task is terminated, it goes last on the list if the CPU times equals
+				
 				RRtime = 2;
-				if(!firstLine.isEmpty())
-				{
-					if(SRTF(Kernel).Name != firstLine.substring(firstLine.length() - 1);
-				}
-				SRTF(Kernel).CPU -= 1;
+				
+					if(!firstLine.isEmpty())
+					{
+						String temp = firstLine.substring(firstLine.length()-1);
+						if(!Kernel.get(0).Name.equals(temp))
+							firstLine += Kernel.get(0).Name;
+					}
+					else if(firstLine.isEmpty()){
+						firstLine += Kernel.get(0).Name;
+					}
+					Kernel.get(0).CPU -= 1;
 			}
 			else 
 			{
-				if(!User.isEmpty())
+				// RR: Round robin scheduling
+				
+				if(!firstLine.isEmpty())
 				{
-					// TODO implement this
-					// RR: Round robin scheduling
+					String temp = firstLine.substring(firstLine.length()-1);
+					if(!User.get(0).Name.equals(temp))
+					{
+						firstLine += User.get(0).Name;
+					}
+				}
+				else if(firstLine.isEmpty())
+				{
+					firstLine += User.get(0).Name;
+				}
+				
+				User.getFirst().CPU -= 1;
+				RRtime -= 1;
+				
+				if(RRtime == 0)
+				{
+					RRtime = 2;
+					User.add(User.pollFirst());
 				}
 			}
 		}
+		System.out.println(firstLine);
 /*
 		for(ATask test : Tasks)
 		{
@@ -111,18 +157,5 @@ public class Main {
 				return false;
 		}
 		return true;
-	}
-	
-	public static ATask SRTF(ArrayList<ATask> Tasks)
-	{
-		ATask Result = Tasks.get(0);
-		
-		for(int i = 0; i < Tasks.size(); i++)
-		{
-			if(Tasks.get(i).CPU > Tasks.get(i+1).CPU)
-				Result = Tasks.get(i+1); 
-		}
-		
-		return Result;
 	}
 }
