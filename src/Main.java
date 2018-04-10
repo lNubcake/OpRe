@@ -38,10 +38,6 @@ public class Main {
 	
 	public static void TaskProcessor(ArrayList<ATask> Tasks)
 	{
-		/*
-		 * If priority = 0 --> SRTF: Shortest remaining time first
-		 * If priority = 1 --> RR: Round robin scheduling
-		 */
 		String firstLine = new String("");
 		String secondLine = new String("");
 		
@@ -56,11 +52,47 @@ public class Main {
 		// As time passes
 		for(int time = 0; isFinished(Tasks); time++)
 		{
+			ArrayList<ATask> TasksToWorkWith = new ArrayList<ATask>();
 			for(ATask task : Tasks)
 			{
-				if(task.Start <= time)
+				// It's already sorted based on Start time
+				if(task.Start <= time && task.CPU != 0)
 				{
-					
+					TasksToWorkWith.add(task);
+				}
+				
+			}
+			
+			ArrayList<ATask> Kernel = new ArrayList<ATask>();
+			ArrayList<ATask> User = new ArrayList<ATask>();
+			for(ATask task : TasksToWorkWith)
+			{
+				if(task.Priority == 0)
+				{
+					Kernel.add(task);
+				}
+				if(task.Priority == 1)
+				{
+					User.add(task);
+				}
+				// Still sorted based on Start time
+			}
+			if(!Kernel.isEmpty())
+			{
+				// SRTF: Shortest remaining time first
+				RRtime = 2;
+				if(!firstLine.isEmpty())
+				{
+					if(SRTF(Kernel).Name != firstLine.substring(firstLine.length() - 1);
+				}
+				SRTF(Kernel).CPU -= 1;
+			}
+			else 
+			{
+				if(!User.isEmpty())
+				{
+					// TODO implement this
+					// RR: Round robin scheduling
 				}
 			}
 		}
@@ -79,5 +111,18 @@ public class Main {
 				return false;
 		}
 		return true;
+	}
+	
+	public static ATask SRTF(ArrayList<ATask> Tasks)
+	{
+		ATask Result = Tasks.get(0);
+		
+		for(int i = 0; i < Tasks.size(); i++)
+		{
+			if(Tasks.get(i).CPU > Tasks.get(i+1).CPU)
+				Result = Tasks.get(i+1); 
+		}
+		
+		return Result;
 	}
 }
