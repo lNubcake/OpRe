@@ -17,9 +17,13 @@ public class Main {
 			TextToProcess.add(myScanner.nextLine());
 		}
 		myScanner.close();
-		
 		// Converts the text to tasks
+		try{
 		Tasks = TextProcessor(TextToProcess);
+		}catch(ArrayIndexOutOfBoundsException e)
+		{
+			e.printStackTrace();
+		}
 		// Processes the tasks and gives the output
 		TaskProcessor(Tasks);
 	}
@@ -30,9 +34,12 @@ public class Main {
 		
 		for(String currentLine : TextToProcess)
 		{
-			String[] split = new String[4];
-			split = currentLine.split(",");
-			Result.add(new ATask(split[0],Integer.parseInt(split[1]),Integer.parseInt(split[2]),Integer.parseInt(split[3])));
+				String[] split = currentLine.split(",");
+				if(split.length == 4)
+				{
+				ATask TaskToAdd = new ATask(split[0],Integer.parseInt(split[1]),Integer.parseInt(split[2]),Integer.parseInt(split[3]));
+				Result.add(TaskToAdd);
+				}
 		}
 		
 		return Result;
@@ -69,6 +76,11 @@ public class Main {
 					if(Kernel.contains(task))
 					{
 						Kernel.remove(task);
+						if(Kernel.isEmpty())
+						{
+							RRtime = 2;
+							User.add(User.pollFirst());
+						}
 					}
 					if(User.contains(task))
 					{
@@ -77,20 +89,23 @@ public class Main {
 				}
 			}
 		
+			boolean UserFlag = false;
 			for(ATask task : TasksToWorkWith)
 			{
 				if(task.Priority == 0 && !Kernel.contains(task))
 				{
-					if(Kernel.isEmpty())
-					{
-						User.add(User.pollFirst());
-					}
 					Kernel.add(task);
 				}
 				if(task.Priority == 1 && !User.contains(task))
 				{
 					User.add(task);
+					UserFlag = true;
 				}
+			}
+			if(UserFlag && RRtime == 0)
+			{
+				RRtime = 2;
+				User.add(User.pollFirst());
 			}
 			
 			// TODO handle exception
@@ -104,12 +119,10 @@ public class Main {
 			if(!Kernel.isEmpty())
 			{
 				// SRTF: Shortest remaining time first
-				RRtime = 2;
 				
 					if(!firstLine.isEmpty())
 					{
-						String temp = firstLine.substring(firstLine.length()-1);
-						if(!Kernel.get(0).Name.equals(temp))
+						if(!Kernel.get(0).Name.equals(firstLine.substring(firstLine.length() - 1)))
 							firstLine += Kernel.get(0).Name;
 					}
 					else if(firstLine.isEmpty()){
@@ -124,14 +137,19 @@ public class Main {
 						}
 					}
 			}
-			else 
+			else if(!User.isEmpty())
 			{
 				// RR: Round robin scheduling
 				
+				if(RRtime == 0)
+				{
+					RRtime = 2;
+					User.add(User.pollFirst());
+				}
+				
 				if(!firstLine.isEmpty())
 				{
-					String temp = firstLine.substring(firstLine.length()-1);
-					if(!User.get(0).Name.equals(temp))
+					if(!User.get(0).Name.equals(firstLine.substring(firstLine.length() - 1)))
 					{
 						firstLine += User.get(0).Name;
 					}
@@ -151,12 +169,6 @@ public class Main {
 						task.Wait += 1;
 					}
 				}
-				
-				if(RRtime == 0)
-				{
-					RRtime = 2;
-					User.add(User.pollFirst());
-				}
 			}
 		}
 		
@@ -165,7 +177,8 @@ public class Main {
 			secondLine += (task.Name + ":" + task.Wait + ",");
 		}
 		// Cutting down the last ','
-		secondLine = secondLine.substring(0, secondLine.length()-1);
+		if(!secondLine.equals(""))
+			secondLine = secondLine.substring(0, secondLine.length()-1);
 		
 		System.out.println(firstLine);
 		System.out.println(secondLine);
